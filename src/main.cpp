@@ -28,10 +28,15 @@ fs::path windowsRelativePath() {
   return fs::path(buffer);
 }
 
+// dir.json Directory
+fs::path dirDirectory() {
+  return windowsRelativePath().parent_path().parent_path() / L"tests" /
+         L"dir.json";
+}
+
 // Parse json
 json parseJson() {
-  std::ifstream f(windowsRelativePath().parent_path().parent_path() /
-                  "dir.json");
+  std::ifstream f(dirDirectory());
   return json::parse(f);
 }
 
@@ -43,25 +48,47 @@ int main(int argc, char *argv[]) {
 
   std::string sourceDir{};
   std::string targetDir{};
+  std::string exclusion{};
+
+  std::string zxc{"badabings"};
 
   json jsonObject{parseJson()};
   for (auto &[key, val] : jsonObject.items()) {
-    for (auto &[source, sourceVal] : val.items()) {
-      // source/target level
-      std::println("{} : ", source);
-      // app/dir level
-      if (source == "source") {
-        for (auto &[app, dir] : sourceVal.items()) {
-          std::cout << dir << '\n';
-          sourceDir = dir;
+    for (auto &[from, fromVal] : val.items()) {
+      std::println("{} : ", from);
+
+      // source
+      if (from == "source" && !fromVal.empty()) {
+        for (auto &[app, dir] : fromVal.items()) {
+
+          if (dir.is_object()) {
+            for (auto &[innerKey, innerVal] : dir.items()) {
+              if (innerKey == "exc") {
+                exclusion = innerVal;
+              }
+
+              if (innerKey == "src") {
+                sourceDir = innerVal;
+              }
+            }
+          }
+
+          // if (sourceDir.back() != '/') {
+          //   sourceDir += '/';
+          // }
         }
       }
     }
   }
 
-  std::cout << '\n';
-  std::cout << sourceDir;
-  std::cout << targetDir;
+  // std::cout << '\n';
+  // std::cout << sourceDir << '\n';
+  // std::cout << targetDir;
+  std::cout << exclusion;
+
+  // Working ofstream
+  // std::ofstream outf{sourceDir + "sample.txt"};
+  // outf << "badabings";
 
   return 0;
 }

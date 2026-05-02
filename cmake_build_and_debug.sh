@@ -1,4 +1,4 @@
 cmake --build ./build --parallel
-./build/DDD.exe
+./build/DDD.exe badabangers
 
 echo
