@@ -2,6 +2,7 @@
 #include <json.hpp>
 #include <print>
 #include <string_view>
+#include <vector>
 using json = nlohmann::json;
 
 #include <filesystem>
@@ -11,6 +12,7 @@ using iterateDir = std::filesystem::recursive_directory_iterator;
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <ranges>
 #include <string>
 
 // Windows specific api
@@ -40,15 +42,21 @@ json parseJson() {
   return json::parse(f);
 }
 
-// Json iterator
-void iterateJson(bool a) {}
+bool doExists(std::string s, std::vector<std::string> v) {
+  for (int i = 0; i < v.size(); i++) {
+    if (s.contains(v[i])) {
+      return true;
+    }
+  }
+  return false;
+}
 
 int main(int argc, char *argv[]) {
   std::string userOptions = argv[1];
 
   std::string sourceDir{};
   std::string targetDir{};
-  std::string exclusion{};
+  std::vector<std::string> exclusion{};
 
   std::string zxc{"badabings"};
 
@@ -64,14 +72,25 @@ int main(int argc, char *argv[]) {
           if (dir.is_object()) {
             for (auto &[innerKey, innerVal] : dir.items()) {
               if (innerKey == "exc") {
-                exclusion = innerVal;
+                exclusion.push_back(innerVal);
               }
 
               if (innerKey == "src") {
-                sourceDir = innerVal;
+                // sourceDir = innerVal;
+                for (auto &srcDir : fs::directory_iterator(innerVal)) {
+                  if (!doExists(srcDir.path().string(), exclusion)) {
+                    std::cout << srcDir.path().string() << '\n';
+                  }
+                }
               }
             }
           }
+
+          // if (!dir.is_object()) {
+          //   for (auto &juxtapose : fs::directory_iterator(dir)) {
+          //     std::cout << juxtapose << '\n';
+          //   }
+          // }
 
           // if (sourceDir.back() != '/') {
           //   sourceDir += '/';
@@ -84,7 +103,10 @@ int main(int argc, char *argv[]) {
   // std::cout << '\n';
   // std::cout << sourceDir << '\n';
   // std::cout << targetDir;
-  std::cout << exclusion;
+
+  for (auto &juxtapose : exclusion) {
+    std::cout << juxtapose << '\n';
+  }
 
   // Working ofstream
   // std::ofstream outf{sourceDir + "sample.txt"};

@@ -31,6 +31,8 @@ int main() {
   std::filesystem::current_path(
       windowsRelativePath().parent_path().parent_path());
 
+  fs::path currentPath{windowsRelativePath().parent_path().parent_path()};
+
   std::filesystem::create_directory("deploy");
   std::filesystem::create_directory("deploy/source");
   std::filesystem::create_directory("deploy/target");
@@ -55,6 +57,11 @@ int main() {
   std::ofstream outf8{"deploy/source/srcDir 3/sample2.txt"};
   std::ofstream outf9{"deploy/source/srcDir 3/sample3.txt"};
   // outf << "badabings";
+
+  for (const auto &juxtapose : std::filesystem::directory_iterator(
+           currentPath / "deploy/source/srcDir 1")) {
+    std::cout << juxtapose << '\n';
+  }
 
   return 0;
 }
