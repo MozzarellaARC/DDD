@@ -54,62 +54,115 @@ bool doExists(std::string s, std::vector<std::string> v) {
 int main(int argc, char *argv[]) {
   std::string userOptions = argv[1];
 
-  std::string sourceDir{};
-  std::string targetDir{};
+  std::vector<std::string> localDirExc{};
+  std::vector<std::string> localDirIncl{};
+  std::vector<std::string> remoteDir{};
+  bool hasInclusion{false};
   std::vector<std::string> exclusion{};
-
-  std::string zxc{"badabings"};
+  std::vector<std::string> inclusion{};
 
   json jsonObject{parseJson()};
   for (auto &[key, val] : jsonObject.items()) {
     for (auto &[from, fromVal] : val.items()) {
       std::println("{} : ", from);
 
-      // source
-      if (from == "source" && !fromVal.empty()) {
+      // local
+      if (from == "local" && !fromVal.empty()) {
         for (auto &[app, dir] : fromVal.items()) {
+          exclusion.clear();
+          inclusion.clear();
+          hasInclusion = false;
+          std::cout << app << '\n';
 
           if (dir.is_object()) {
-            for (auto &[innerKey, innerVal] : dir.items()) {
-              if (innerKey == "exc") {
-                exclusion.push_back(innerVal);
-              }
 
+            // Pass 1: collect filters
+            for (auto &[innerKey, innerVal] : dir.items()) {
+              if (innerKey == "exc" && !doExists(innerVal, exclusion))
+                exclusion.push_back(innerVal);
+              if (innerKey == "incl") {
+                hasInclusion = true;
+                if (!doExists(innerVal, inclusion))
+                  inclusion.push_back(innerVal);
+              }
+            }
+
+            // Pass 2: scan source directories
+            for (auto &[innerKey, innerVal] : dir.items()) {
               if (innerKey == "src") {
-                // sourceDir = innerVal;
+                // localDir = innerVal;
                 for (auto &srcDir : fs::directory_iterator(innerVal)) {
-                  if (!doExists(srcDir.path().string(), exclusion)) {
-                    std::cout << srcDir.path().string() << '\n';
+                  bool check_inclusion =
+                      doExists(srcDir.path().string(), inclusion);
+
+                  bool check_exclusion =
+                      doExists(srcDir.path().string(), exclusion);
+
+                  if (hasInclusion) {
+                    // inclusion mode: only print files in inclusion list
+                    if (check_inclusion) {
+                      std::cout << srcDir << '\n';
+                      localDirIncl.push_back(srcDir.path().string());
+                    }
+                  } else {
+                    // exclusion mode: print everything except excluded files
+                    if (!check_exclusion) {
+                      std::cout << srcDir << '\n';
+                      localDirExc.push_back(srcDir.path().string());
+                    }
                   }
                 }
               }
             }
           }
+        }
+      }
 
-          // if (!dir.is_object()) {
-          //   for (auto &juxtapose : fs::directory_iterator(dir)) {
-          //     std::cout << juxtapose << '\n';
-          //   }
-          // }
-
-          // if (sourceDir.back() != '/') {
-          //   sourceDir += '/';
-          // }
+      // remote
+      if (from == "remote" && !fromVal.empty()) {
+        for (auto &[app, dir] : fromVal.items()) {
+          for (auto &[innerKey, innerVal] : dir.items()) {
+            for (auto &srcDir : fs::directory_iterator(innerVal)) {
+              remoteDir.push_back(srcDir.path().string());
+            }
+          }
         }
       }
     }
   }
 
   // std::cout << '\n';
-  // std::cout << sourceDir << '\n';
-  // std::cout << targetDir;
+  // std::cout << localDir << '\n';
+  // std::cout << remoteDir;
 
-  for (auto &juxtapose : exclusion) {
+  // for (auto &juxtapose : localDirExc) {
+  //   std::cout << juxtapose << '\n';
+  // }
+  //
+  // for (auto &juxtapose : localDirIncl) {
+  //   std::cout << juxtapose << '\n';
+  // }
+
+  std::cout << '\n';
+
+  for (auto &juxtapose : remoteDir) {
     std::cout << juxtapose << '\n';
   }
+  //
+  // std::cout << '\n';
+
+  // for (auto &juxtapose : exclusion) {
+  //   std::cout << juxtapose << '\n';
+  // }
+  //
+  // std::cout << '\n';
+  //
+  // for (auto &juxtapose : inclusion) {
+  //   std::cout << juxtapose << '\n';
+  // }
 
   // Working ofstream
-  // std::ofstream outf{sourceDir + "sample.txt"};
+  // std::ofstream outf{localDir + "sample.txt"};
   // outf << "badabings";
 
   return 0;
