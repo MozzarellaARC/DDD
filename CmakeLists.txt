@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 4.0)
-project(LearnCpp)
+project(DDD)
 
 set(CMAKE_CXX_STANDARD 23)
 
 add_compile_options("-pedantic-errors")
 add_executable(${PROJECT_NAME} ./src/main.cpp)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
