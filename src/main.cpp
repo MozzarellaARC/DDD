@@ -42,6 +42,7 @@ json parseJson() {
   return json::parse(f);
 }
 
+// Check if a substring exists in a vector<string>
 bool doExists(std::string s, std::vector<std::string> v) {
   for (int i = 0; i < v.size(); i++) {
     if (s.contains(v[i])) {
@@ -72,7 +73,6 @@ int main(int argc, char *argv[]) {
           exclusion.clear();
           inclusion.clear();
           hasInclusion = false;
-          std::cout << app << '\n';
 
           if (dir.is_object()) {
 
@@ -91,6 +91,9 @@ int main(int argc, char *argv[]) {
             for (auto &[innerKey, innerVal] : dir.items()) {
               if (innerKey == "src") {
                 // localDir = innerVal;
+                if (!fs::is_empty(innerVal)) {
+                  std::cout << app << '\n';
+                }
                 for (auto &srcDir : fs::directory_iterator(innerVal)) {
                   bool check_inclusion =
                       doExists(srcDir.path().string(), inclusion);
@@ -121,8 +124,12 @@ int main(int argc, char *argv[]) {
       // remote
       if (from == "remote" && !fromVal.empty()) {
         for (auto &[app, dir] : fromVal.items()) {
+          if (!fs::is_empty(dir)) {
+            std::cout << app << '\n';
+          }
           for (auto &[innerKey, innerVal] : dir.items()) {
             for (auto &srcDir : fs::directory_iterator(innerVal)) {
+              std::cout << srcDir << '\n';
               remoteDir.push_back(srcDir.path().string());
             }
           }
@@ -145,9 +152,9 @@ int main(int argc, char *argv[]) {
 
   std::cout << '\n';
 
-  for (auto &juxtapose : remoteDir) {
-    std::cout << juxtapose << '\n';
-  }
+  // for (auto &juxtapose : remoteDir) {
+  //   std::cout << juxtapose << '\n';
+  // }
   //
   // std::cout << '\n';
 
