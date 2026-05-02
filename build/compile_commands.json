@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Users/M/Desktop/DDD/build",
+  "command": "C:\\PROGRA~1\\LLVM\\bin\\CLANG_~1.EXE -IC:/Users/M/Desktop/DDD/src/include -O0 -std=gnu++23 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -pedantic-errors @CMakeFiles\\LearnCpp.dir\\src\\main.cpp.obj.modmap -o CMakeFiles\\LearnCpp.dir\\src\\main.cpp.obj -c C:\\Users\\M\\Desktop\\DDD\\src\\main.cpp",
+  "file": "C:/Users/M/Desktop/DDD/src/main.cpp",
+  "output": "C:/Users/M/Desktop/DDD/build/CMakeFiles/LearnCpp.dir/src/main.cpp.obj"
+}
+]

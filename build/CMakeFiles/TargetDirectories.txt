@@ -1,0 +1,3 @@
+C:/Users/M/Desktop/DDD/build/CMakeFiles/LearnCpp.dir
+C:/Users/M/Desktop/DDD/build/CMakeFiles/edit_cache.dir
+C:/Users/M/Desktop/DDD/build/CMakeFiles/rebuild_cache.dir
