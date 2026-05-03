@@ -16,12 +16,13 @@ using iterateDir = std::filesystem::recursive_directory_iterator;
 #include <string>
 
 struct ManagedObject {
-  std::vector<std::string> localDirExc{};
-  std::vector<std::string> localDirIncl{};
-  std::vector<std::string> remoteDir{};
+  static inline std::vector<std::string> jsonNeedleIncl{};
+  static inline std::vector<std::string> jsonNeedleExcl{};
 
-  std::vector<std::string> exclusion{};
-  std::vector<std::string> inclusion{};
+  static inline std::vector<std::string> localSourceDir{};
+  static inline std::vector<std::string> remoteSourceDir{};
+
+  static inline bool hasIncl{true};
 };
 
 // Windows specific api
@@ -61,8 +62,6 @@ bool doExists(std::string s, std::vector<std::string> v) {
   return false;
 }
 
-void jsonObjectManager(ManagedObject &data) {}
-
 // Source - https://stackoverflow.com/a/20303915
 // Posted by masoud, modified by community. See post 'Timeline' for change
 // history Retrieved 2026-05-03, License - CC BY-SA 4.0
@@ -78,23 +77,8 @@ bool in_array(const std::string &value,
 }
 // >
 
-int main(int argc, char *argv[]) {
-  std::string userOptions = argv[1];
-
-  std::vector<std::string> needle{"sample1", "sample2"};
-  std::vector<std::string> jsonNeedleIncl{};
-  std::vector<std::string> jsonNeedleExcl{};
-
-  std::vector<std::string> localSourceDir{};
-  std::vector<std::string> remoteSourceDir{};
-
-  bool hasIncl{true};
-
-  ManagedObject data{};
-  jsonObjectManager(data);
-
+void jsonObjectManager(ManagedObject &data) {
   json jsonObject{parseJson()};
-
   // dir pass
   for (auto &[baseKey, baseVal] : jsonObject.items()) {
     for (auto &[sourceKey, sourceVal] : baseVal.items()) {
@@ -103,22 +87,22 @@ int main(int argc, char *argv[]) {
       if (sourceKey == "local") {
         for (auto &[appKey, appVal] : sourceVal.items()) {
           std::cout << appKey << '\n';
-          jsonNeedleIncl.clear();
-          jsonNeedleExcl.clear();
+          data.jsonNeedleIncl.clear();
+          data.jsonNeedleExcl.clear();
 
           if (appVal.is_object()) {
             // filter pass
             for (auto &[innerKey, innerVal] : appVal.items()) {
               if (innerKey == "incl") {
                 for (auto inclusionElement : innerVal) {
-                  jsonNeedleIncl.push_back(inclusionElement);
-                  hasIncl = true;
+                  data.jsonNeedleIncl.push_back(inclusionElement);
+                  data.hasIncl = true;
                 }
               }
               if (innerKey == "exc") {
                 for (auto exclusionElement : innerVal) {
-                  jsonNeedleExcl.push_back(exclusionElement);
-                  hasIncl = false;
+                  data.jsonNeedleExcl.push_back(exclusionElement);
+                  data.hasIncl = false;
                 }
               }
             }
@@ -127,16 +111,16 @@ int main(int argc, char *argv[]) {
             for (auto &[innerKey, innerVal] : appVal.items()) {
               if (innerKey == "src") {
                 for (auto &srcDir : fs::directory_iterator(innerVal)) {
-                  if (in_array(srcDir.path().string(), jsonNeedleIncl) &&
-                      hasIncl) {
+                  if (in_array(srcDir.path().string(), data.jsonNeedleIncl) &&
+                      data.hasIncl) {
                     std::cout << srcDir << '\n';
-                    localSourceDir.push_back(srcDir.path().string());
+                    data.localSourceDir.push_back(srcDir.path().string());
                   }
 
-                  if (!in_array(srcDir.path().string(), jsonNeedleExcl) &&
-                      !hasIncl) {
+                  if (!in_array(srcDir.path().string(), data.jsonNeedleExcl) &&
+                      !data.hasIncl) {
                     std::cout << srcDir << '\n';
-                    localSourceDir.push_back(srcDir.path().string());
+                    data.localSourceDir.push_back(srcDir.path().string());
                   }
                 }
               }
@@ -147,7 +131,7 @@ int main(int argc, char *argv[]) {
           if (!appVal.is_object()) {
             for (auto &srcDir : fs::directory_iterator(appVal)) {
               std::cout << srcDir << '\n';
-              localSourceDir.push_back(srcDir.path().string());
+              data.localSourceDir.push_back(srcDir.path().string());
             }
           }
         }
@@ -158,21 +142,44 @@ int main(int argc, char *argv[]) {
         for (auto &[appKey, appVal] : sourceVal.items()) {
           std::cout << appKey << '\n';
           std::cout << appVal << '\n';
-          remoteSourceDir.push_back(appVal);
+          data.remoteSourceDir.push_back(appVal);
         }
       }
     }
   }
+}
 
-  std::cout << "Local source dir\n";
-  for (auto &juxtapose : localSourceDir) {
-    std::cout << juxtapose << '\n';
-  }
+int main(int argc, char *argv[]) {
+  std::string userOptions = argv[1];
 
-  std::cout << "Remote source dir\n";
-  for (auto &juxtapose : remoteSourceDir) {
-    std::cout << juxtapose << '\n';
-  }
+  // std::string input{};
+  // std::cin >> input;
+
+  // ManagedObject data{};
+  // jsonObjectManager(data);
+
+  std::vector<std::vector<int>> matrix = {
+      {1, 2},
+      {4, 5},
+      {7, 8},
+  };
+
+  std::cout << matrix[1][1];
+  matrix.push_back({});
+  matrix[3][1] = 13;
+  std::cout << matrix[3][1];
+
+  // const auto copyOptions =
+  //     fs::copy_options::overwrite_existing | fs::copy_options::recursive;
+  //
+  // if (input == "retrieve") {
+  //   for (auto &remoteElement : data.remoteSourceDir) {
+  //     for (auto &localElement : data.localSourceDir) {
+  //       std::println("{} \t-> \t{}", localElement, remoteElement);
+  //       fs::copy(localElement, remoteElement, copyOptions);
+  //     }
+  //   }
+  // }
 
   return 0;
 }
