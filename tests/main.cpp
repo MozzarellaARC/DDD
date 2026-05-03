@@ -48,14 +48,35 @@ int main() {
   std::ofstream outf1{"deploy/local/localDir 1/sample1.txt"};
   std::ofstream outf2{"deploy/local/localDir 1/sample2.txt"};
   std::ofstream outf3{"deploy/local/localDir 1/sample3.txt"};
+  std::ofstream outf1a{"deploy/local/localDir 1/sample4.txt"};
+  std::ofstream outf2b{"deploy/local/localDir 1/sample5.txt"};
+  std::ofstream outf3c{"deploy/local/localDir 1/sample6.txt"};
+  std::ofstream outf3d{"deploy/local/localDir 1/sample7.txt"};
+  std::ofstream outf1e{"deploy/local/localDir 1/sample8.txt"};
+  std::ofstream outf2f{"deploy/local/localDir 1/sample9.txt"};
+  std::ofstream outf3g{"deploy/local/localDir 1/sample10.txt"};
 
   std::ofstream outf4{"deploy/local/localDir 2/sample1.txt"};
   std::ofstream outf5{"deploy/local/localDir 2/sample2.txt"};
   std::ofstream outf6{"deploy/local/localDir 2/sample3.txt"};
+  std::ofstream outf4a{"deploy/local/localDir 2/sample4.txt"};
+  std::ofstream outf5b{"deploy/local/localDir 2/sample5.txt"};
+  std::ofstream outf6c{"deploy/local/localDir 2/sample6.txt"};
+  std::ofstream outf6d{"deploy/local/localDir 2/sample7.txt"};
+  std::ofstream outf4e{"deploy/local/localDir 2/sample8.txt"};
+  std::ofstream outf5f{"deploy/local/localDir 2/sample9.txt"};
+  std::ofstream outf6g{"deploy/local/localDir 2/sample10.txt"};
 
   std::ofstream outf7{"deploy/local/localDir 3/sample1.txt"};
   std::ofstream outf8{"deploy/local/localDir 3/sample2.txt"};
   std::ofstream outf9{"deploy/local/localDir 3/sample3.txt"};
+  std::ofstream outf7a{"deploy/local/localDir 3/sample4.txt"};
+  std::ofstream outf8b{"deploy/local/localDir 3/sample5.txt"};
+  std::ofstream outf9c{"deploy/local/localDir 3/sample6.txt"};
+  std::ofstream outf9d{"deploy/local/localDir 3/sample7.txt"};
+  std::ofstream outf7e{"deploy/local/localDir 3/sample8.txt"};
+  std::ofstream outf8f{"deploy/local/localDir 3/sample9.txt"};
+  std::ofstream outf9g{"deploy/local/localDir 3/sample10.txt"};
   // outf << "badabings";
 
   for (const auto &juxtapose : std::filesystem::directory_iterator(
