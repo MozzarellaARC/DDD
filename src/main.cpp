@@ -98,6 +98,8 @@ int main(int argc, char *argv[]) {
   // dir pass
   for (auto &[baseKey, baseVal] : jsonObject.items()) {
     for (auto &[sourceKey, sourceVal] : baseVal.items()) {
+      std::cout << sourceKey << '\n';
+      // local
       if (sourceKey == "local") {
         for (auto &[appKey, appVal] : sourceVal.items()) {
           std::cout << appKey << '\n';
@@ -145,44 +147,32 @@ int main(int argc, char *argv[]) {
           if (!appVal.is_object()) {
             for (auto &srcDir : fs::directory_iterator(appVal)) {
               std::cout << srcDir << '\n';
+              localSourceDir.push_back(srcDir.path().string());
             }
           }
+        }
+      }
+
+      // remote
+      if (sourceKey == "remote") {
+        for (auto &[appKey, appVal] : sourceVal.items()) {
+          std::cout << appKey << '\n';
+          std::cout << appVal << '\n';
+          remoteSourceDir.push_back(appVal);
         }
       }
     }
   }
 
-  // // movement from remote doesn't need exclusive check
-  // for (auto &[baseKey, baseVal] : jsonObject.items()) {
-  //   for (auto &[sourceKey, sourceVal] : baseVal.items()) {
-  //     if (sourceKey == "remote") {
-  //       for (auto &[appKey, appVal] : sourceVal.items()) {
-  //         for (auto &[innerKey, innerVal] : appVal.items()) {
-  //           for (auto &srcDir : fs::directory_iterator(innerVal)) {
-  //             if (in_array(srcDir.path().string(), needle)) {
-  //               // std::cout << srcDir << '\n';
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+  std::cout << "Local source dir\n";
+  for (auto &juxtapose : localSourceDir) {
+    std::cout << juxtapose << '\n';
+  }
 
-  //
-  // for (auto &juxtapose : localSourceDir) {
-  //   std::cout << juxtapose << '\n';
-  // }
-
-  // std::cout << "needle inlcude\n";
-  // for (auto &juxtapose : jsonNeedleIncl) {
-  //   std::cout << juxtapose << '\n';
-  // }
-  //
-  // std::cout << "needle exclude\n";
-  // for (auto &juxtapose : jsonNeedleExcl) {
-  //   std::cout << juxtapose << '\n';
-  // }
+  std::cout << "Remote source dir\n";
+  for (auto &juxtapose : remoteSourceDir) {
+    std::cout << juxtapose << '\n';
+  }
 
   return 0;
 }
