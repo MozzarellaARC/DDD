@@ -195,6 +195,7 @@ int main(int argc, char* argv[]) {
 
     for (const auto& local : localVal.dirVal) {
       for (const auto& remote : remoteVal.dirVal) {
+        fs::copy(local, remote, copyOptions);
         std::cout << local << "\t -> \t" << remote << '\n';
       }
     }
