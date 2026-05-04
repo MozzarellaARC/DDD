@@ -166,6 +166,10 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
+  if (argc < 2) {
+    std::cout << "Too many arguments" << std::endl;
+  }
+
   std::string userOptions = argv[1];
 
   ManagedObject data{};
@@ -211,16 +215,26 @@ int main(int argc, char* argv[]) {
         }
       }
     }
+    return 0;
   }
 
   if (userOptions == "deploy" || userOptions == "set") {
     for (auto& [remoteKey, remoteVal] : data.remoteDirMap) {
       std::cout << remoteKey << ": " << '\n';
+      auto localIt = data.flattenedLocalDirMap.at(remoteKey);
 
       for (auto& remote : remoteVal.dirVal) {
-        std::cout << remote << " -> " << data.flattenedLocalDirMap.at(remoteKey) << '\n';
+        fs::copy(remote, localIt, copyOptions);
+
+        std::cout << remote << " -> " << localIt << '\n';
       }
     }
+    return 0;
+  }
+
+  if (userOptions != "retrieve" || userOptions != "deploy") {
+    std::cout << "There is only 2 options retrieve or deploy" << std::endl;
+    return 0;
   }
 
   return 0;
