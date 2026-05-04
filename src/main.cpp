@@ -1,5 +1,6 @@
 #include <chrono>
 #include <json.hpp>
+#include <ostream>
 #include <print>
 #include <string_view>
 #include <unordered_map>
@@ -159,10 +160,13 @@ void jsonObjectManager(ManagedObject& data, Dir& dir) {
 }
 
 int main(int argc, char* argv[]) {
-  std::string userOptions = argv[1];
 
-  // std::string input{};
-  // std::cin >> input;
+  if (argc < 2) {
+    std::cout << "Add retrieve or deploy" << std::endl;
+    return 0;
+  }
+
+  std::string userOptions = argv[1];
 
   ManagedObject data{};
   Dir dir{};
@@ -188,15 +192,33 @@ int main(int argc, char* argv[]) {
 
   const auto copyOptions = fs::copy_options::overwrite_existing | fs::copy_options::recursive;
 
-  for (const auto& [localKey, localVal] : data.localDirMap) {
-    std::cout << localKey << ": " << '\n';
-    auto remoteIt         = data.remoteDirMap.find(localKey);
-    const auto& remoteVal = remoteIt->second;
+  if (userOptions == "retrieve" || userOptions == "get") {
+    for (const auto& [localKey, localVal] : data.localDirMap) {
+      std::cout << localKey << ": " << '\n';
+      auto remoteIt         = data.remoteDirMap.find(localKey);
+      const auto& remoteVal = remoteIt->second;
 
-    for (const auto& local : localVal.dirVal) {
-      for (const auto& remote : remoteVal.dirVal) {
-        fs::copy(local, remote, copyOptions);
-        std::cout << local << "\t -> \t" << remote << '\n';
+      for (const auto& local : localVal.dirVal) {
+        for (const auto& remote : remoteVal.dirVal) {
+          if (fs::exists(remote)) {
+            fs::remove_all(remote);
+          }
+
+          fs::create_directories(remote);
+          fs::copy(local, remote, copyOptions);
+
+          std::cout << local << "\t -> \t" << remote << '\n';
+        }
+      }
+    }
+  }
+
+  if (userOptions == "deploy" || userOptions == "set") {
+    for (auto& [remoteKey, remoteVal] : data.remoteDirMap) {
+      std::cout << remoteKey << ": " << '\n';
+
+      for (auto& remote : remoteVal.dirVal) {
+        std::cout << remote << " -> " << data.flattenedLocalDirMap.at(remoteKey) << '\n';
       }
     }
   }
