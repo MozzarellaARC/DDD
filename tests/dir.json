@@ -1,0 +1,18 @@
+{
+  "local": {
+    "a": {
+      "src": "C:/Users/M/Desktop/DDD/tests/deploy/local/localDir 1/",
+      "exc": "sample3"
+    },
+    "b": {
+      "src": "C:/Users/M/Desktop/DDD/tests/deploy/local/localDir 2/",
+      "incl": "sample2"
+    },
+    "c": "C:/Users/M/Desktop/DDD/tests/deploy/local/localDir 3/"
+  },
+  "remote": {
+    "a": "C:/Users/M/Desktop/DDD/tests/deploy/remote/remoteDir 1/",
+    "b": "C:/Users/M/Desktop/DDD/tests/deploy/remote/remoteDir 2/",
+    "c": "C:/Users/M/Desktop/DDD/tests/deploy/remote/remoteDir 3/"
+  }
+}

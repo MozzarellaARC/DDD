@@ -1,0 +1,25 @@
+{
+  "local": {
+    "a": {
+      "src": "C:/Users/M/Desktop/DDD/tests/deploy/local/localDir 1/",
+      "exc": [
+        "sample3",
+        "sample10"
+      ]
+    },
+    "b": {
+      "src": "C:/Users/M/Desktop/DDD/tests/deploy/local/localDir 2/",
+      "incl": [
+        "sample2",
+        "sample7",
+        "sample10"
+      ]
+    },
+    "nvim": "C:/Users/M/Desktop/DDD/tests/deploy/local/nvim/"
+  },
+  "remote": {
+    "a": "C:/Users/M/Desktop/DDD/tests/deploy/remote/remoteDir 1/",
+    "b": "C:/Users/M/Desktop/DDD/tests/deploy/remote/remoteDir 2/",
+    "nvim": "C:/Users/M/Desktop/DDD/tests/deploy/remote/nvim/"
+  }
+}
