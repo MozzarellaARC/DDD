@@ -10,7 +10,7 @@
 			"type": "cppvsdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}\\build\\${workspaceFolderBasename}.exe",
-			"args": ["retrieve"],
+			"args": ["deploy"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}\\build",
 			"environment": [],

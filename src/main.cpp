@@ -119,15 +119,17 @@ void jsonObjectManager(ManagedObject& data, Dir& dir) {
                 data.flattenedLocalDirMap[appKey] = innerVal.get<fs::path>();
 
                 // dir content
-                for (auto& srcDir : fs::directory_iterator(innerVal)) {
-                  if (in_array(srcDir.path().string(), data.jsonNeedleIncl) && data.hasIncl) {
-                    // std::cout << srcDir << '\n';
-                    data.localDirMap[appKey].dirVal.push_back(srcDir.path());
-                  }
+                if (fs::exists(innerVal)) {
+                  for (auto& srcDir : fs::directory_iterator(innerVal)) {
+                    if (in_array(srcDir.path().string(), data.jsonNeedleIncl) && data.hasIncl) {
+                      // std::cout << srcDir << '\n';
+                      data.localDirMap[appKey].dirVal.push_back(srcDir.path());
+                    }
 
-                  if (!in_array(srcDir.path().string(), data.jsonNeedleExcl) && !data.hasIncl) {
-                    // std::cout << srcDir << '\n';
-                    data.localDirMap[appKey].dirVal.push_back(srcDir.path());
+                    if (!in_array(srcDir.path().string(), data.jsonNeedleExcl) && !data.hasIncl) {
+                      // std::cout << srcDir << '\n';
+                      data.localDirMap[appKey].dirVal.push_back(srcDir.path());
+                    }
                   }
                 }
               }
@@ -137,9 +139,11 @@ void jsonObjectManager(ManagedObject& data, Dir& dir) {
           // pure dir
           if (!appVal.is_object()) {
             data.flattenedLocalDirMap[appKey] = appVal.get<fs::path>();
-            for (auto& srcDir : fs::directory_iterator(appVal)) {
-              // std::cout << srcDir << '\n';
-              data.localDirMap[appKey].dirVal.push_back(srcDir.path());
+            if (fs::exists(appVal)) {
+              for (auto& srcDir : fs::directory_iterator(appVal)) {
+                // std::cout << srcDir << '\n';
+                data.localDirMap[appKey].dirVal.push_back(srcDir.path());
+              }
             }
           }
         }
@@ -196,8 +200,6 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Here mark the end of the debugging messeages";
 
-  const auto copyOptions = fs::copy_options::overwrite_existing | fs::copy_options::recursive;
-
   if (userOptions == "retrieve" || userOptions == "get") {
     for (const auto& [localKey, localVal] : data.localDirMap) {
       std::cout << localKey << ": " << '\n';
@@ -215,7 +217,8 @@ int main(int argc, char* argv[]) {
         }
 
         for (const auto& local : localVal.dirVal) {
-          fs::copy(local, remote / local.filename(), copyOptions);
+          fs::copy(local, remote / local.filename(),
+                   fs::copy_options::overwrite_existing | fs::copy_options::recursive);
           std::cout << local << "\t -> \t" << remote << '\n';
         }
       }
@@ -229,8 +232,13 @@ int main(int argc, char* argv[]) {
       std::cout << remoteKey << ": " << '\n';
       auto localIt = data.flattenedLocalDirMap.at(remoteKey);
 
+      if (!fs::exists(localIt)) {
+        fs::create_directories(localIt);
+      }
+
       for (auto& remote : remoteVal.dirVal) {
-        fs::copy(remote, localIt, copyOptions);
+
+        fs::copy(remote, localIt, fs::copy_options::update_existing | fs::copy_options::recursive);
 
         std::cout << remote << " -> " << localIt << '\n';
       }
