@@ -1,18 +1,16 @@
+#include <algorithm>
 #include <chrono>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <json.hpp>
 #include <ostream>
 #include <print>
+#include <ranges>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-
-#include <filesystem>
-
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <ranges>
-#include <string>
 
 // Windows specific api
 #include <Windows.h>
@@ -51,7 +49,7 @@ fs::path windowsRelativePath() {
 
 // dir.json Directory
 fs::path dirDirectory() {
-  return windowsRelativePath().parent_path().parent_path() / L"tests" / L"dirTests.json";
+  return windowsRelativePath().parent_path().parent_path() / L"tests" / L"dir.json";
 }
 
 // Parse json
@@ -115,7 +113,6 @@ void jsonObjectManager(ManagedObject& data, Dir& dir) {
             // directory pass
             for (auto& [innerKey, innerVal] : appVal.items()) {
               if (innerKey == "src") {
-
                 data.flattenedLocalDirMap[appKey] = innerVal.get<fs::path>();
 
                 // dir content
@@ -164,9 +161,8 @@ void jsonObjectManager(ManagedObject& data, Dir& dir) {
 }
 
 int main(int argc, char* argv[]) {
-
-  if (argc < 2) {
-    std::cout << "Add retrieve or deploy" << std::endl;
+  if (argc > 2) {
+    std::cout << "Add retrieve, deploy or check" << std::endl;
     return 0;
   }
 
@@ -176,29 +172,37 @@ int main(int argc, char* argv[]) {
 
   std::string userOptions = argv[1];
 
+  if (!fs::exists(dirDirectory())) {
+    std::cout << "dir.json does not exists";
+    return 0;
+  }
+
   ManagedObject data{};
   Dir dir{};
   jsonObjectManager(data, dir);
 
-  for (const auto& [key, value] : data.localDirMap) {
-    std::cout << '\n' << "local " << key << " : " << '\n';
-    for (auto& v : value.dirVal) {
-      std::cout << v.string() << '\n';
+  if (userOptions == "check" && fs::exists(dirDirectory())) {
+    std::cout << "dir.json exists, you can proceed!";
+
+    for (const auto& [key, value] : data.localDirMap) {
+      std::cout << '\n' << "local " << key << " : " << '\n';
+      for (auto& v : value.dirVal) {
+        std::cout << v.string() << '\n';
+      }
     }
-  }
 
-  for (const auto& [key, value] : data.flattenedLocalDirMap) {
-    std::cout << '\n' << "flattened local " << key << " : \n" << value.string() << '\n';
-  }
-
-  for (const auto& [key, value] : data.remoteDirMap) {
-    std::cout << '\n' << "remote " << key << " : " << '\n';
-    for (auto& v : value.dirVal) {
-      std::cout << v.string() << '\n';
+    for (const auto& [key, value] : data.flattenedLocalDirMap) {
+      std::cout << '\n' << "flattened local " << key << " : \n" << value.string() << '\n';
     }
-  }
 
-  std::cout << "Here mark the end of the debugging messeages";
+    for (const auto& [key, value] : data.remoteDirMap) {
+      std::cout << '\n' << "remote " << key << " : " << '\n';
+      for (auto& v : value.dirVal) {
+        std::cout << v.string() << '\n';
+      }
+    }
+    return 0;
+  }
 
   if (userOptions == "retrieve" || userOptions == "get") {
     for (const auto& [localKey, localVal] : data.localDirMap) {
@@ -237,7 +241,6 @@ int main(int argc, char* argv[]) {
       }
 
       for (auto& remote : remoteVal.dirVal) {
-
         fs::copy(remote, localIt, fs::copy_options::update_existing | fs::copy_options::recursive);
 
         std::cout << remote << " -> " << localIt << '\n';
@@ -246,8 +249,8 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  if (userOptions != "retrieve" || userOptions != "deploy") {
-    std::cout << "There is only 2 options retrieve or deploy" << std::endl;
+  if (userOptions != "retrieve" || userOptions != "deploy" || userOptions != "check") {
+    std::cout << "There is only 3 options retrieve, deploy or check" << std::endl;
     return 0;
   }
 
