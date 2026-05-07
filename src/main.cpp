@@ -49,7 +49,7 @@ fs::path windowsRelativePath() {
 
 // dir.json Directory
 fs::path dirDirectory() {
-  return windowsRelativePath().parent_path().parent_path() / L"tests" / L"dir.json";
+  return windowsRelativePath().parent_path() / L"dir.json";
 }
 
 // Parse json
